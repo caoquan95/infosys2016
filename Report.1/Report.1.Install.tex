@@ -1,6 +1,8 @@
 \documentclass[12pt, letterpaper, twoside]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
+\usepackage{listings}
+\usepackage{color}
 \graphicspath{ {images/} }
  
 \title{Lab work report 1}
@@ -14,11 +16,17 @@
 \maketitle
 \end{titlepage}
 
+\begin{lstlisting}[language=Bash]
+mysql -u root -p < employees.sql 
+\end{lstlisting}
 
 \begin{figure}[h]
 \centerline{\includegraphics[width=0.6\textwidth]{img2.jpg}}
 \end{figure}
 
+\begin{lstlisting}[language=Bash]
+mysql -u root -p -t < test_employees_md5.sql
+\end{lstlisting}
 
 
 \begin{figure}[h]
