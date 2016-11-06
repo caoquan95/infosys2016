@@ -124,12 +124,25 @@ select dept_name from departments;
 \begin{lstlisting}[language=SQL]
 
 select CONCAT(first_name," ",last_name) as full_name 
-from employees join dept_emp 
-on employees.emp_no = dept_emp.emp_no
-join departments 
-on departments.dept_no = dept_emp.dept_no
-where dept_name = "Sales"
+from employees where emp_no 
+in
+(select emp_no from dept_emp where dept_no 
+in (select dept_no from departments 
+where dept_name = "Sales"))
 
+
+| Paris Deyuan                  |
+| Lihong Pusterhofer            |
+| Akeel Baez                    |
+| Changho Noriega               |
+| Rosalie Slobodova             |
+| Doohun Schnelling             |
+| Susanne Matteis               |
+| Marco Cairo                   |
+| Morris Smeets                 |
+| Fumiko Luke                   |
+| Chenyi Hainaut                |
+| Jagoda Lanphier               |
 | Maja Lamba                    |
 | Raimond Leuchs                |
 | Mong Usdin                    |
@@ -148,7 +161,7 @@ where dept_name = "Sales"
 | Rimli Dusink                  |
 | Bangqing Kleiser              |
 +-------------------------------+
-52245 rows in set (0.20 sec)
+52245 rows in set (0.27 sec)
 
 
 \end{lstlisting}
@@ -157,12 +170,16 @@ where dept_name = "Sales"
 \begin{lstlisting}[language=SQL]
 
 select CONCAT(first_name," ",last_name) as full_name 
-from employees join dept_emp 
-on employees.emp_no = dept_emp.emp_no
-join departments 
-on departments.dept_no = dept_emp.dept_no
-where dept_name = "Finance" and gender = "M";
+from employees where
+emp_no in
+(select emp_no from dept_emp where dept_no 
+in (select dept_no from departments 
+where dept_name = "Finance")) 
+and gender = "M";
 
+
+| Peer Gist                    |
+| Sachio Cannane               |
 | Huican Gelosh                |
 | Masamitsu Matheson           |
 | Doohun Pelz                  |
@@ -190,15 +207,17 @@ where dept_name = "Finance" and gender = "M";
 \begin{lstlisting}[language=SQL]
 
 select salary from salaries
-join employees  
-on employees.emp_no = salaries.emp_no
-join dept_emp
-on employees.emp_no = dept_emp.emp_no
-join departments 
-on departments.dept_no = dept_emp.dept_no
-where dept_name = "Marketing" and gender = "F";
-
-
+where emp_no in 
+(select emp_no from employees 
+where gender = "F" and
+emp_no in
+(select emp_no from dept_emp where dept_no 
+in (select dept_no from departments
+ where dept_name = "Marketing")));
+ 
+ |  73008 |
+|  75462 |
+|  76837 |
 |  43005 |
 |  47320 |
 |  50713 |
@@ -216,7 +235,7 @@ where dept_name = "Marketing" and gender = "F";
 |  79327 |
 |  80389 |
 +--------+
-74996 rows in set (0.28 sec)
+74996 rows in set (0.26 sec)
 
 
 \end{lstlisting}
@@ -224,84 +243,93 @@ where dept_name = "Marketing" and gender = "F";
 \item Full names of employees who have the same last name as their manager
 \begin{lstlisting}[language=SQL]
 
-select concat(e1.first_name," ",e1.last_name) as full_name
-from employees e1
-join employees e2
-on e1.last_name = e2.last_name
-join dept_emp
-on e1.emp_no = dept_emp.emp_no
-join dept_manager 
-on dept_manager.emp_no = e2.emp_no
-where dept_manager.dept_no = dept_emp.dept_no
+select concat(first_name," ",last_name) as full_name
+from employees 
+where last_name in 
+(select last_name from employees
+where emp_no in 
+(select emp_no from dept_manager));
 
-| Parke Spinelli         |
-| Kellie Spinelli        |
-| Zhigen Spinelli        |
-| Hilari Spinelli        |
-| Stabislas Weedman      |
-| Shimshon Weedman       |
-| Yagil Weedman          |
-| Valter Weedman         |
-| Apostol Weedman        |
-| Yuchang Weedman        |
-| Maya Weedman           |
-| Mamdouh Weedman        |
-| Feipei Weedman         |
-| Valdiodio Weedman      |
-| Saeed Weedman          |
-| Wanqing Weedman        |
-| Shen Weedman           |
-| Dinkar Weedman         |
-| Jaques Weedman         |
-| Marc Weedman           |
-+------------------------+
-624 rows in set (4.18 sec)
+| Geoffry Alpin              |
+| Chinho Hagimont            |
+| Zorica Ghazalie            |
+| Adas Hofmeyr               |
+| Heping Alpin               |
+| Shigeaki DasSarma          |
+| Yinghua Markovitch         |
+| Mingzeng Quadeer           |
+| Sanjay Sigstam             |
+| Abdelkader Ghazalie        |
+| Gudjon Hagimont            |
+| Padma Hofmeyr              |
+| Suvo Minakawa              |
+| Xiaoshan Sigstam           |
+| Mong Staelin               |
+| Parto Kambil               |
+| Martine Markovitch         |
+| Zine Ghazalie              |
+| Vasilis Kaelbling          |
+| Xiadong Hofmeyr            |
+| Hidde Alpin                |
+| Heekeun Weedman            |
++----------------------------+
+4403 rows in set (0.57 sec)
+
 \end{lstlisting}
 
 \item Full names of managers who have been doing the job twice
 \begin{lstlisting}[language=SQL]
 
-select count(distinct x.emp_no) as managers_number from
+select count(1)/2 as managers_number from
 dept_manager x join dept_manager y on
 x.emp_no = y.emp_no
 and x.dept_no <> y.dept_no;
 
-Empty set (0.00 sec)
++-----------------+
+| managers_number |
++-----------------+
+|          1.0000 |
++-----------------+
+1 row in set (0.00 sec)
+
 
 \end{lstlisting}
 
 \item Full names of employees who was paid more than \$100000
 \begin{lstlisting}[language=SQL]
 
-select distinct employees.emp_no, 
-concat(first_name," ",last_name) 
-as full_name
+select concat(first_name," ",last_name) as full_name
 from employees 
-join salaries on 
-employees.emp_no = salaries.emp_no
-where salary > 100000
+where emp_no in 
+(select emp_no from salaries
+where salary > 100000)
 
-| 499766 | Akhilish Zobel              |
-| 499793 | Feipei Setlzner             |
-| 499794 | Saniya Hettesheimer         |
-| 499807 | Foong Godskesen             |
-| 499817 | Lihong Pusterhofer          |
-| 499820 | Akeel Baez                  |
-| 499862 | Armond Fraisse              |
-| 499881 | Christoph Schneeberger      |
-| 499899 | Mong Usdin                  |
-| 499902 | Aloke Wuwongse              |
-| 499919 | Masako Angiulli             |
-| 499920 | Christ Murtagh              |
-| 499926 | Youpyo Perfilyeva           |
-| 499953 | Leszek Pulkowski            |
-| 499970 | Danai Hedayat               |
-| 499976 | Guozhong Felder             |
-| 499980 | Gino Usery                  |
-| 499986 | Nathan Ranta                |
-| 499988 | Bangqing Kleiser            |
-+--------+-----------------------------+
-19018 rows in set (1.38 sec)
+| Aamod Bernatsky             |
+| Maya Melter                 |
+| Uriel Daescu                |
+| Zengping Peir               |
+| Akhilish Zobel              |
+| Feipei Setlzner             |
+| Saniya Hettesheimer         |
+| Foong Godskesen             |
+| Lihong Pusterhofer          |
+| Akeel Baez                  |
+| Armond Fraisse              |
+| Christoph Schneeberger      |
+| Mong Usdin                  |
+| Aloke Wuwongse              |
+| Masako Angiulli             |
+| Christ Murtagh              |
+| Youpyo Perfilyeva           |
+| Leszek Pulkowski            |
+| Danai Hedayat               |
+| Guozhong Felder             |
+| Gino Usery                  |
+| Nathan Ranta                |
+| Bangqing Kleiser            |
++-----------------------------+
+19018 rows in set (1.27 sec)
+
 
 
 \end{lstlisting}
@@ -309,13 +337,15 @@ where salary > 100000
 \item Names of all departments that have employees paid morethan \$1000000
 \begin{lstlisting}[language=SQL]
 
-select distinct dept_name 
+select dept_name 
 from  departments
-join dept_emp
-on dept_emp.dept_no = departments.dept_no
-join salaries
-on salaries.emp_no = dept_emp.emp_no
-where salary > 100000 
+where dept_no in
+(select dept_no 
+from dept_emp 
+where emp_no in
+(select emp_no 
+from salaries
+where salary > 100000 ));
 
 +--------------------+
 | dept_name          |
@@ -331,6 +361,7 @@ where salary > 100000
 | Sales              |
 +--------------------+
 9 rows in set (0.00 sec)
+
 
 \end{lstlisting}
 
