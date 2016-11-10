@@ -1,0 +1,76 @@
+\documentclass[12pt, letterpaper, twoside]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{color}
+\graphicspath{ {images/} }
+ 
+\title{Lab work report 4 - UPDATE, DELETE}
+\author{Cao Anh Quan - ICT Master}
+\date{November 10, 2016}
+ 
+ 
+\begin{document}
+ 
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\begin{itemize}
+
+\item Create new departments (Research and Development, Marketing and Sales).
+
+\item Change all relevant employees to new departments by update the dept\_no fields of $2$ tables dept\_manager and dept\_emp from the old departments to new departments.
+
+\item Delete all the old departments.
+
+\end{itemize}
+
+\begin{lstlisting}[language=SQL]
+
+insert into `departments` values 
+("d010","Research and Development"),
+("d011","Marketing and Sales");
+Query OK, 2 rows affected (0.00 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+
+update `dept_manager`  set 
+dept_no = "d010" 
+where dept_no = "d005" or dept_no = "d008";
+Query OK, 4 rows affected (0.01 sec)
+Rows matched: 4  Changed: 4  Warnings: 0
+
+
+update ignore dept_emp`
+set dept_no = "d010"
+where dept_no = "d005" or dept_no = "d008";
+Query OK, 101599 rows affected (8.85 sec)
+Rows matched: 106833  Changed: 101599  Warnings: 0
+
+
+update ignore `dept_emp` 
+set dept_no = "d011"
+where dept_no = "d001" or dept_no = "d007";
+Query OK, 68804 rows affected (2.81 sec)
+Rows matched: 72456  Changed: 68804  Warnings: 0
+
+
+update ignore `dept_manager` 
+set dept_no = "d011"
+where dept_no = "d001" or dept_no = "d007";
+Query OK, 4 rows affected (0.00 sec)
+Rows matched: 4  Changed: 4  Warnings: 0
+
+
+delete from departments where 
+dept_no = "d005" or 
+dept_no = "d008" or 
+dept_no = "d001" or 
+dept_no = "d007";
+Query OK, 4 rows affected (0.08 sec)
+
+\end{lstlisting}
+
+ 
+\end{document}
