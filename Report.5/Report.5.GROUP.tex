@@ -1,0 +1,204 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{listings}
+\usepackage{color}
+\graphicspath{ {images/} }
+ 
+\title{Lab work report 5 - GROUP}
+\author{Cao Anh Quan - ICT Master}
+\date{November 11, 2016}
+ 
+ 
+\begin{document}
+ 
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\begin{itemize}
+
+\item What is the average salary of each employee?
+\begin{lstlisting}[language=SQL]
+
+select  
+	employees.emp_no, 
+	concat(employees.first_name," ",employees.last_name),
+	avg(salary) as "average salary" 
+from salaries
+join
+employees
+on employees.emp_no = salaries.emp_no
+group by emp_no;
+
+| 499984 | Kaijung Rodham                                       |     54431.2143 |
+| 499985 | Gila Lukaszewicz                                     |     43500.6667 |
+| 499986 | Nathan Ranta                                         |    105961.7059 |
+| 499987 | Rimli Dusink                                         |     54279.6667 |
+| 499988 | Bangqing Kleiser                                     |     86700.7143 |
+| 499989 | Keiichiro Lindqvist                                  |     68260.4000 |
+| 499990 | Khaled Kohling                                       |     43325.0000 |
+| 499991 | Pohua Sichman                                        |     47829.5000 |
+| 499992 | Siamak Salverda                                      |     64179.7500 |
+| 499993 | DeForest Mullainathan                                |     40944.6667 |
+| 499994 | Navin Argence                                        |     40000.0000 |
+| 499995 | Dekang Lichtner                                      |     45891.6667 |
+| 499996 | Zito Baaz                                            |     63134.1429 |
+| 499997 | Berhard Lenart                                       |     66475.8667 |
+| 499998 | Patricia Breugel                                     |     46665.5556 |
+| 499999 | Sachin Tsukuda                                       |     70625.0000 |
++--------+------------------------------------------------------+----------------+
+300024 rows in set (1.71 sec)
+
+
+\end{lstlisting}
+
+
+\item How much was each employee paid in total?
+\begin{lstlisting}[language=SQL]
+
+select  
+	employees.emp_no, 
+	concat(employees.first_name," ",employees.last_name),
+	sum(salary) as "total salary" 
+from salaries
+join
+employees
+on employees.emp_no = salaries.emp_no
+group by emp_no;
+
+
+| 499986 | Nathan Ranta                                         |      1801349 |
+| 499987 | Rimli Dusink                                         |       162839 |
+| 499988 | Bangqing Kleiser                                     |      1213810 |
+| 499989 | Keiichiro Lindqvist                                  |       341302 |
+| 499990 | Khaled Kohling                                       |       129975 |
+| 499991 | Pohua Sichman                                        |       286977 |
+| 499992 | Siamak Salverda                                      |      1026876 |
+| 499993 | DeForest Mullainathan                                |       245668 |
+| 499994 | Navin Argence                                        |        40000 |
+| 499995 | Dekang Lichtner                                      |       275350 |
+| 499996 | Zito Baaz                                            |       441939 |
+| 499997 | Berhard Lenart                                       |       997138 |
+| 499998 | Patricia Breugel                                     |       419990 |
+| 499999 | Sachin Tsukuda                                       |       353125 |
++--------+------------------------------------------------------+--------------+
+300024 rows in set (1.68 sec)
+
+
+\end{lstlisting}
+
+
+\item Minimum, maximum and total salaries of each department?
+\begin{lstlisting}[language=SQL]
+
+select  
+	dept_name, 
+	min(salary) as "min salary", 
+	max(salary) as "max salary", 
+	sum(salary) as "total salary"
+from salaries
+join dept_emp
+on dept_emp.emp_no = salaries.emp_no
+join departments
+on departments.dept_no = dept_emp.dept_no
+group by dept_emp.dept_no;
+
++--------------------------+------------+------------+--------------+
+| dept_name                | min salary | max salary | total salary |
++--------------------------+------------+------------+--------------+
+| Finance                  |      38812 |     142395 |  11650834677 |
+| Human Resources          |      38735 |     141953 |   9363811425 |
+| Production               |      38623 |     138273 |  41554438942 |
+| Quality Management       |      38786 |     132103 |  10865203635 |
+| Customer Service         |      38836 |     144866 |  13143639841 |
+| Research and Development |      38849 |     144434 |  57200885924 |
+| Marketing and Sales      |      39127 |     158220 |  51054820927 |
++--------------------------+------------+------------+--------------+
+7 rows in set (2.78 sec)
+
+\end{lstlisting}
+
+
+\item Which departments have paid more than 20 billion dollars for their employees?
+\begin{lstlisting}[language=SQL]
+
+select  
+	dept_name
+from salaries
+join dept_emp
+on dept_emp.emp_no = salaries.emp_no
+join departments
+on departments.dept_no = dept_emp.dept_no
+group by dept_emp.dept_no
+having sum(salary) > 20000000000;
+
++--------------------------+
+| dept_name                |
++--------------------------+
+| Production               |
+| Research and Development |
+| Marketing and Sales      |
++--------------------------+
+3 rows in set (2.70 sec)
+
+
+
+\end{lstlisting}
+
+
+\item Total salaries of male employees in each department?
+\begin{lstlisting}[language=SQL]
+
+select  
+	sum(salary) as total_salary
+from salaries
+join employees
+on employees.emp_no = salaries.emp_no 
+where employees.gender = "M";
+
++--------------+
+| total_salary |
++--------------+
+| 108928421890 |
++--------------+
+1 row in set (0.96 sec)
+
+\end{lstlisting}
+
+
+\item Total salaries of department managers for each department, from highest to lowest?
+\begin{lstlisting}[language=SQL]
+select  
+	departments.dept_name,
+	sum(salary) as total_salary
+from salaries
+join dept_manager
+on dept_manager.emp_no = salaries.emp_no 
+join departments
+on departments.dept_no = dept_manager.dept_no
+group by dept_manager.dept_no
+order by total_salary desc;
+
++--------------------------+--------------+
+| dept_name                | total_salary |
++--------------------------+--------------+
+| Marketing and Sales      |      6008127 |
+| Research and Development |      4587037 |
+| Quality Management       |      4162118 |
+| Production               |      3374004 |
+| Customer Service         |      3187661 |
+| Finance                  |      2549372 |
+| Human Resources          |      2098298 |
++--------------------------+--------------+
+7 rows in set (0.00 sec)
+
+\end{lstlisting}
+
+\end{itemize}
+
+
+
+ 
+\end{document}
