@@ -125,7 +125,8 @@ group by dept_emp.dept_no;
 \begin{lstlisting}[language=SQL]
 
 select  
-	dept_name
+	dept_name,
+	sum(salary) as total_salary
 from salaries
 join dept_emp
 on dept_emp.emp_no = salaries.emp_no
@@ -134,14 +135,14 @@ on departments.dept_no = dept_emp.dept_no
 group by dept_emp.dept_no
 having sum(salary) > 20000000000;
 
-+--------------------------+
-| dept_name                |
-+--------------------------+
-| Production               |
-| Research and Development |
-| Marketing and Sales      |
-+--------------------------+
-3 rows in set (2.70 sec)
++--------------------------+--------------+
+| dept_name                | total_salary |
++--------------------------+--------------+
+| Production               |  41554438942 |
+| Research and Development |  57200885924 |
+| Marketing and Sales      |  51054820927 |
++--------------------------+--------------+
+3 rows in set (3.23 sec)
 
 
 
@@ -152,18 +153,31 @@ having sum(salary) > 20000000000;
 \begin{lstlisting}[language=SQL]
 
 select  
+	departments.dept_name,
 	sum(salary) as total_salary
 from salaries
 join employees
 on employees.emp_no = salaries.emp_no 
-where employees.gender = "M";
+join dept_emp
+on employees.emp_no = dept_emp.emp_no 
+join departments
+on departments.dept_no = dept_emp.dept_no 
+where employees.gender = "M"
+group by departments.dept_no;
 
-+--------------+
-| total_salary |
-+--------------+
-| 108928421890 |
-+--------------+
-1 row in set (0.96 sec)
++--------------------------+--------------+
+| dept_name                | total_salary |
++--------------------------+--------------+
+| Finance                  |   6940675318 |
+| Human Resources          |   5619533959 |
+| Production               |  24873889749 |
+| Quality Management       |   6472073211 |
+| Customer Service         |   7865587983 |
+| Research and Development |  34387010200 |
+| Marketing and Sales      |  30754859529 |
++--------------------------+--------------+
+7 rows in set (2.41 sec)
+
 
 \end{lstlisting}
 
