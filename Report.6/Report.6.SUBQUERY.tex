@@ -128,6 +128,7 @@ order by avg_salary desc;
 \begin{lstlisting}[language=SQL]
 
 
+
 select title, avg(average_salary) as avg_salary from
 titles
 join
@@ -135,21 +136,18 @@ join
 from salaries 
 group by emp_no) as t1
 on titles.emp_no = t1.emp_no
+where title like "%Engineer%"
 group by title
 order by avg_salary desc;
 
 +--------------------+----------------+
 | title              | avg_salary     |
 +--------------------+----------------+
-| Senior Staff       | 69119.55058257 |
-| Staff              | 66956.82969188 |
-| Manager            | 66044.38422083 |
 | Senior Engineer    | 59144.76835191 |
 | Engineer           | 57244.45845623 |
-| Technique Leader   | 57034.81413021 |
 | Assistant Engineer | 56963.53043254 |
 +--------------------+----------------+
-7 rows in set (1.40 sec)
+3 rows in set (1.30 sec)
 
 
 
