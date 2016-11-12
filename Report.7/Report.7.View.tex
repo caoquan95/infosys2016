@@ -153,7 +153,6 @@ create view average_salary as
 	group by emp_no;
 Query OK, 0 rows affected (0.01 sec)
 
-
 select title, avg(average_salary) as avg_salary from
 titles join
 average_salary
