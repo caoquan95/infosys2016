@@ -66,14 +66,26 @@ where dept_name = "Production") and
 hire_date >= (select max(from_date) from dept_manager
 where dept_no = (select dept_no from departments
 where dept_name = "Production"))
-order by hire_date desc limit 0,1;
+order by hire_date desc;
 
-+--------+------------+------------+-----------+--------+------------+
-| emp_no | birth_date | first_name | last_name | gender | hire_date  |
-+--------+------------+------------+-----------+--------+------------+
-| 428377 | 1957-05-09 | Yucai      | Gerlach   | M      | 2000-01-23 |
-+--------+------------+------------+-----------+--------+------------+
-1 row in set (0.20 sec)
+|  63851 | 1957-07-20 | Mohit          | Bergere          | M      | 1996-08-31 |
+| 208806 | 1953-07-21 | Chinya         | Naudin           | M      | 1996-08-31 |
+| 275246 | 1958-10-09 | Hatem          | Larfeldt         | M      | 1996-08-31 |
+| 439670 | 1960-04-13 | Supot          | Siegrist         | F      | 1996-08-31 |
+| 240179 | 1956-04-29 | Fumitaka       | Pettit           | F      | 1996-08-31 |
+| 283373 | 1964-11-03 | Kellie         | Georgakopoulos   | F      | 1996-08-31 |
+| 262599 | 1955-12-22 | Maria          | Mullainathan     | M      | 1996-08-31 |
+| 255685 | 1956-10-30 | Dines          | Bahi             | M      | 1996-08-31 |
+| 484298 | 1958-05-27 | Henk           | Demke            | F      | 1996-08-31 |
+| 239704 | 1952-08-01 | Eldridge       | Bernatsky        | M      | 1996-08-30 |
+| 286545 | 1954-06-25 | Yuuichi        | Heiserman        | F      | 1996-08-30 |
+| 475381 | 1958-06-08 | Mokhtar        | Detkin           | M      | 1996-08-30 |
+|  41427 | 1953-10-26 | Ekawit         | Kusakabe         | M      | 1996-08-30 |
+| 418548 | 1953-04-13 | Pranay         | Molenkamp        | M      | 1996-08-30 |
+| 233057 | 1962-10-01 | Sibyl          | Molenaar         | M      | 1996-08-30 |
++--------+------------+----------------+------------------+--------+------------+
+3764 rows in set (0.21 sec)
+
 
 
 \end{lstlisting}
