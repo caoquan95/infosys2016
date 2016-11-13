@@ -7,7 +7,7 @@
 \graphicspath{ {images/} }
 \usepackage{float}
  
-\title{Lab work report 10 - Design magazine}
+\title{Lab work report 11 - NGO}
 \author{Cao Anh Quan - ICT Master}
 \date{November 13, 2016}
  
@@ -19,6 +19,7 @@
 \end{titlepage}
 
 \begin{enumerate}
+
 
 
 \item Determine \emph{Concepts}
@@ -65,41 +66,54 @@
 create database magazine;
 use magazine;
 
-CREATE TABLE Magazine (
-	id INT NOT NULL AUTO_INCREMENT,
-	title VARCHAR(50),
-	issn VARCHAR(50),
-	`year` INT,
-	`order` INT,
-	number INT,
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE Article (
-	id INT NOT NULL AUTO_INCREMENT,
-	magazineId INT NOT NULL,
-	title VARCHAR(50),
-	beginPage INT,
-	endPage INT,
-	PRIMARY KEY (id),
-	FOREIGN KEY (magazineId) REFERENCES Magazine(id)
-);
-
-CREATE TABLE Author (
+CREATE TABLE Person (
 	id INT NOT NULL AUTO_INCREMENT,
 	name VARCHAR(50),
-	email VARCHAR(50),
-	ascription VARCHAR(250),
 	PRIMARY KEY (id)
 );
 
+CREATE TABLE City (
+	id INT NOT NULL AUTO_INCREMENT,
+	name VARCHAR(50),
+	country VARCHAR(50),
+	inhabitants INT,
+	PRIMARY KEY (id)
+);
 
-CREATE TABLE ArticleAuthor (
-	articleId INT NOT NULL,
-	authorId INT NOT NULL,
-	PRIMARY KEY (authorId,articleId),
-	FOREIGN KEY (articleId) REFERENCES Article(id),
-	FOREIGN KEY (authorId) REFERENCES Author(id)
+CREATE TABLE Office (
+	id INT NOT NULL AUTO_INCREMENT,
+	directorId INT NOT NULL,
+	cityId INT NOT NULL,
+	address VARCHAR(50),
+	phone VARCHAR(50),
+	PRIMARY KEY (id),
+	FOREIGN KEY (directorId) REFERENCES Person(id),
+	FOREIGN KEY (cityId) REFERENCES City(id)
+);
+
+CREATE TABLE Project (
+	id INT NOT NULL AUTO_INCREMENT,
+	code VARCHAR(50),
+	title VARCHAR(50),
+	endDate Date,
+	beginDate Date,
+	budget INT,
+	personId INT,
+	PRIMARY KEY (id),
+	FOREIGN KEY (personId) REFERENCES Person(id)
+);
+
+
+CREATE TABLE Action (
+	id INT NOT NULL,
+	name VARCHAR(50),
+	investment INT,
+	projectId INT,
+	cityId INT,
+	description VARCHAR(255)
+	PRIMARY KEY (id),
+	FOREIGN KEY (cityId) REFERENCES City(id),
+	FOREIGN KEY (projectId) REFERENCES Project(id)
 );
 
 
