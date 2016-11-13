@@ -1,0 +1,187 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{listings}
+\usepackage{color}
+\graphicspath{ {images/} }
+ 
+\title{Lab work report 7 - View}
+\author{Cao Anh Quan - ICT Master}
+\date{November 12, 2016}
+ 
+ 
+\begin{document}
+ 
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\begin{enumerate}
+
+
+
+\item Who have the same name as the managers of the “Finance” department?
+\begin{lstlisting}[language=SQL]
+
+create view last_name_manager as 
+	select last_name
+	from employees 
+	join dept_manager
+		on dept_manager.emp_no = employees.emp_no
+	join departments 
+		on departments.dept_no = dept_manager.dept_no
+	where dept_name = "Finance";
+	
+Query OK, 0 rows affected (0.02 sec)
+
+select * from employees 
+where last_name in 
+(select last_name from last_name_manager);
+
+| 493266 | 1959-05-28 | Constantijn   | Legleitner | M      | 1986-05-25 |
+| 493332 | 1958-12-20 | Anoosh        | Legleitner | M      | 1988-11-10 |
+| 493821 | 1963-06-03 | Aiichiro      | Legleitner | F      | 1988-04-07 |
+| 495608 | 1955-01-02 | Gift          | Legleitner | M      | 1994-04-28 |
+| 496062 | 1955-01-18 | Xinan         | Legleitner | M      | 1994-05-02 |
+| 497267 | 1956-05-24 | Gilbert       | Alpin      | F      | 1990-07-21 |
+| 497479 | 1960-09-03 | Ramalingam    | Alpin      | M      | 1992-05-03 |
+| 497947 | 1963-08-15 | Ekawit        | Alpin      | M      | 1995-06-29 |
+| 497954 | 1957-12-17 | Hilary        | Legleitner | M      | 1991-08-07 |
+| 498115 | 1957-10-11 | Geoffry       | Alpin      | M      | 1985-10-01 |
+| 498634 | 1964-02-17 | Heping        | Alpin      | M      | 1987-12-14 |
+| 499867 | 1962-01-25 | Hidde         | Alpin      | F      | 1988-10-13 |
++--------+------------+---------------+------------+--------+------------+
+408 rows in set (0.14 sec)
+
+
+
+\end{lstlisting}
+
+\item Who in the “Production” department were hired after the promotion of the last
+ manager in that department?
+ \begin{lstlisting}[language=SQL]
+
+create view emp_no_production as
+	select emp_no 
+	from departments
+	join dept_emp 
+		on dept_emp.dept_no = departments.dept_no
+	where dept_name = "Production";
+	
+Query OK, 0 rows affected (0.01 sec)
+
+create view max_from_date as
+	select max(from_date) as max_date from dept_manager
+	where dept_no = (select dept_no from departments
+	where dept_name = "Production");
+	
+Query OK, 0 rows affected (0.01 sec)
+
+select * from employees 
+where emp_no in 
+(select emp_no from emp_no_production) 
+and
+hire_date >= (select max_date from max_from_date)
+order by hire_date desc;
+
+|  63851 | 1957-07-20 | Mohit          | Bergere          | M      | 1996-08-31 |
+| 208806 | 1953-07-21 | Chinya         | Naudin           | M      | 1996-08-31 |
+| 275246 | 1958-10-09 | Hatem          | Larfeldt         | M      | 1996-08-31 |
+| 439670 | 1960-04-13 | Supot          | Siegrist         | F      | 1996-08-31 |
+| 240179 | 1956-04-29 | Fumitaka       | Pettit           | F      | 1996-08-31 |
+| 283373 | 1964-11-03 | Kellie         | Georgakopoulos   | F      | 1996-08-31 |
+| 262599 | 1955-12-22 | Maria          | Mullainathan     | M      | 1996-08-31 |
+| 255685 | 1956-10-30 | Dines          | Bahi             | M      | 1996-08-31 |
+| 484298 | 1958-05-27 | Henk           | Demke            | F      | 1996-08-31 |
+| 239704 | 1952-08-01 | Eldridge       | Bernatsky        | M      | 1996-08-30 |
+| 286545 | 1954-06-25 | Yuuichi        | Heiserman        | F      | 1996-08-30 |
+| 475381 | 1958-06-08 | Mokhtar        | Detkin           | M      | 1996-08-30 |
+|  41427 | 1953-10-26 | Ekawit         | Kusakabe         | M      | 1996-08-30 |
+| 418548 | 1953-04-13 | Pranay         | Molenkamp        | M      | 1996-08-30 |
+| 233057 | 1962-10-01 | Sibyl          | Molenaar         | M      | 1996-08-30 |
++--------+------------+----------------+------------------+--------+------------+
+3764 rows in set (0.21 sec)
+
+
+
+\end{lstlisting}
+
+
+\item Find the average salary of each department, from highest to lowest.
+
+\begin{lstlisting}[language=SQL]
+
+create view avg_salary as
+	select emp_no, avg(salary) as average_salary
+	from salaries 
+	group by emp_no;
+Query OK, 0 rows affected (0.01 sec)
+
+select dept_name, avg(average_salary) as avg_salary
+from dept_emp join
+avg_salary
+on dept_emp.emp_no = avg_salary.emp_no
+join departments
+on departments.dept_no = dept_emp.dept_no
+group by departments.dept_no
+order by avg_salary desc;
+
++--------------------------+----------------+
+| dept_name                | avg_salary     |
++--------------------------+----------------+
+| Marketing and Sales      | 75852.69558780 |
+| Finance                  | 68061.43501801 |
+| Production               | 57253.31382027 |
+| Research and Development | 57188.90672100 |
+| Customer Service         | 56480.08591880 |
+| Quality Management       | 54892.93507273 |
+| Human Resources          | 53214.29085744 |
++--------------------------+----------------+
+7 rows in set (1.20 sec)
+
+\end{lstlisting}
+
+
+\item Find the average salary of each job title, from highest to lowest.
+
+\begin{lstlisting}[language=SQL]
+
+create view average_salary as
+	select emp_no, avg(salary) as average_salary
+	from salaries 
+	group by emp_no;
+Query OK, 0 rows affected (0.01 sec)
+
+select title, avg(average_salary) as avg_salary from
+titles join
+average_salary
+on titles.emp_no = average_salary.emp_no
+where title like "%Engineer%"
+group by title
+order by avg_salary desc;
+
++--------------------+----------------+
+| title              | avg_salary     |
++--------------------+----------------+
+| Senior Engineer    | 59144.76835191 |
+| Engineer           | 57244.45845623 |
+| Assistant Engineer | 56963.53043254 |
++--------------------+----------------+
+3 rows in set (1.30 sec)
+
+
+
+\end{lstlisting}
+
+
+
+
+
+
+\end{enumerate}
+
+
+
+ 
+\end{document}
